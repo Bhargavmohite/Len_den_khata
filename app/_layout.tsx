@@ -1,24 +1,102 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import "@/global.css";
+import { Stack } from "expo-router";
+import { SQLiteProvider } from "expo-sqlite";
+import { Suspense } from "react";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Suspense fallback={null}>
+      <SQLiteProvider
+        databaseName='lenDenKhata.db'
+        onInit={async (db) => {
+          try {
+            // 1️⃣ Enable FK first
+            await db.execAsync("PRAGMA foreign_keys = ON");
+
+            // 2️⃣ Create tables ONLY
+            await db.execAsync(`
+              CREATE TABLE IF NOT EXISTS Customer (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customerName TEXT NOT NULL,
+                MBCountryCode TEXT NOT NULL DEFAULT '+91',
+                mobileNumber INTEGER NOT NULL,
+                email TEXT NOT NULL,
+                creditLimit INTEGER NOT NULL,
+                creditPeriod INTEGER NOT NULL
+              );
+          `);
+
+            await db.execAsync(`
+              CREATE TABLE IF NOT EXISTS Supply (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                supplyName TEXT NOT NULL,
+                MBCountryCode TEXT NOT NULL DEFAULT '+91',
+                mobileNumber INTEGER NOT NULL,
+                email TEXT NOT NULL,
+                creditLimit INTEGER NOT NULL,
+                creditPeriod INTEGER NOT NULL
+              );
+            `);
+            // await db.execAsync(`DROP TABLE IF EXISTS Bank;`);
+            await db.execAsync(`
+              CREATE TABLE IF NOT EXISTS Bank (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                bankName TEXT NOT NULL,
+                OpeningBalance INTEGER NOT NULL
+              );
+            `);
+
+            await db.execAsync(`
+              CREATE TABLE IF NOT EXISTS Purchase (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                InvoiceNo INTEGER NOT NULL,
+                invoiceDate TEXT NOT NULL,
+                supplyId INTEGER NOT NULL,
+                amount INTEGER NOT NULL,
+                narration TEXT,
+                FOREIGN KEY (supplyId) REFERENCES Supply(id)
+              ); `);
+
+            await db.execAsync(`
+              CREATE TABLE IF NOT EXISTS MoneyPaid (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                InvoiceNo INTEGER NOT NULL,
+                invoiceDate TEXT NOT NULL,
+                supplyId INTEGER NOT NULL,
+                amount INTEGER NOT NULL,
+                narration TEXT,
+                FOREIGN KEY (supplyId) REFERENCES Supply(id)
+              ); `);
+
+            await db.execAsync(`
+              CREATE TABLE IF NOT EXISTS Sales (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                InvoiceNo INTEGER NOT NULL,
+                invoiceDate TEXT NOT NULL,
+                customerId INTEGER NOT NULL,
+                amount INTEGER NOT NULL,
+                narration TEXT,
+                FOREIGN KEY (customerId) REFERENCES Customer(id)
+              );`);
+
+            await db.execAsync(`
+              CREATE TABLE IF NOT EXISTS MoneyReceived (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                InvoiceNo INTEGER NOT NULL,
+                invoiceDate TEXT NOT NULL,
+                customerId INTEGER NOT NULL,
+                amount INTEGER NOT NULL,
+                narration TEXT,
+                FOREIGN KEY (customerId) REFERENCES Customer(id)
+              );`);
+          } catch (error) {}
+        }}
+      >
+        <Stack>
+          <Stack.Screen name='index' options={{ headerShown: false }} />
+          <Stack.Screen name='(user)' options={{ headerShown: false }} />
+        </Stack>
+      </SQLiteProvider>
+    </Suspense>
   );
 }
