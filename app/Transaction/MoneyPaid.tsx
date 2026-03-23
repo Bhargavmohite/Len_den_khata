@@ -21,6 +21,7 @@ interface MoneyPaidType {
   InvoiceNo: string;
   invoiceDate: string;
   supplyId: number;
+  bankId: number;
   amount: number;
   narration?: string;
 }
@@ -32,6 +33,7 @@ const money_paid = () => {
     invoiceNo: "",
     invoiceDate: "",
     supplyId: null as number | null,
+    bankId: null as number | null,
     amount: "",
     narration: "",
   });
@@ -39,6 +41,10 @@ const money_paid = () => {
   const [supplyList, setSupplyList] = useState<
     { id: number; supplyName: string }[]
   >([]);
+
+  const [bankList, setBankList] = useState<{ id: number; bankName: string }[]>(
+    [],
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [refreshList, setRefreshList] = useState(false);
@@ -73,6 +79,19 @@ const money_paid = () => {
       }
     };
     loadSupplies();
+
+    const loadsBanks = async () => {
+      try {
+        const result = await db.getAllAsync(
+          "SELECT id, bankName FROM Bank ORDER BY bankName",
+        );
+        setBankList(result);
+      } catch (error) {
+        console.error("Error loading suppliers:", error);
+      }
+    };
+
+    loadsBanks();
   }, []);
 
   const handleSubmit = async () => {
@@ -89,12 +108,13 @@ const money_paid = () => {
     try {
       await db.runAsync(
         `INSERT INTO MoneyPaid 
-         (InvoiceNo, invoiceDate, supplyId, amount, narration)
+         (InvoiceNo, invoiceDate, supplyId,bankId,amount, narration)
          VALUES (?, ?, ?, ?, ?)`,
         [
           form.invoiceNo,
           form.invoiceDate,
           form.supplyId,
+          form.bankId,
           Number(form.amount),
           form.narration,
         ],
@@ -106,6 +126,7 @@ const money_paid = () => {
         invoiceNo: "",
         invoiceDate: "",
         supplyId: null,
+        bankId: null,
         amount: "",
         narration: "",
       });
@@ -149,6 +170,7 @@ const money_paid = () => {
           invoiceNo: result.InvoiceNo,
           invoiceDate: result.invoiceDate,
           supplyId: result.supplyId,
+          bankId: result.bankId,
           amount: String(result.amount),
           narration: result.narration || "",
         });
@@ -173,12 +195,13 @@ const money_paid = () => {
     try {
       await db.runAsync(
         `UPDATE MoneyPaid 
-         SET InvoiceNo = ?, invoiceDate = ?, supplyId = ?, amount = ?, narration = ?
+         SET InvoiceNo = ?, invoiceDate = ?, supplyId = ?, bankId = ?,amount = ?, narration = ?
          WHERE id = ?`,
         [
           form.invoiceNo,
           form.invoiceDate,
           form.supplyId,
+          form.bankId,
           Number(form.amount),
           form.narration,
           selectedInvoiceId,
@@ -192,6 +215,7 @@ const money_paid = () => {
         invoiceNo: "",
         invoiceDate: "",
         supplyId: null,
+        bankId: null,
         amount: "",
         narration: "",
       });
@@ -258,6 +282,19 @@ const money_paid = () => {
             value={form.amount}
             onChangeText={(t) => setForm({ ...form, amount: t })}
           />
+
+          <Text className='text-base font-medium mt-4 pb-2'>Bank Name</Text>
+          <View className='rounded-lg border border-[#dbe0e6] dark:border-gray-600 bg-white dark:bg-gray-800 px-4 text-base text-black dark:text-white'>
+            <Picker
+              selectedValue={form.bankId}
+              onValueChange={(v) => setForm({ ...form, bankId: v })}
+            >
+              <Picker.Item label='Select Bank Name' value={undefined} />
+              {bankList.map((s) => (
+                <Picker.Item key={s.id} label={s.bankName} value={s.id} />
+              ))}
+            </Picker>
+          </View>
 
           <Text className='text-base font-medium mt-4 pb-2'>Narration</Text>
           <TextInput

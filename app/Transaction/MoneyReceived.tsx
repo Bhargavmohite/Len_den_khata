@@ -23,6 +23,7 @@ const MoneyReceived = () => {
     invoiceNo: "",
     invoiceDate: "",
     customerId: null as number | null,
+    bankId: null as number | null,
     amount: "",
     narration: "",
   });
@@ -32,6 +33,10 @@ const MoneyReceived = () => {
   const [customerList, setCustomerList] = useState<
     { id: number; customerName: string }[]
   >([]);
+
+  const [bankList, setBankList] = useState<{ id: number; bankName: string }[]>(
+    [],
+  );
   const [refreshList, setRefreshList] = useState(false);
 
   const [showModifyModal, setShowModifyModal] = useState(false);
@@ -65,12 +70,13 @@ const MoneyReceived = () => {
 
     try {
       await db.runAsync(
-        `INSERT INTO MoneyReceived (InvoiceNo, invoiceDate, customerId, amount, narration)
-         VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO MoneyReceived (InvoiceNo, invoiceDate, customerId,bankId,amount, narration)
+         VALUES (?, ?, ?, ?, ? ,?)`,
         [
           form.invoiceNo,
           form.invoiceDate,
           form.customerId,
+          form.bankId,
           Number(form.amount),
           form.narration,
         ],
@@ -82,6 +88,7 @@ const MoneyReceived = () => {
         invoiceNo: "",
         invoiceDate: "",
         customerId: null,
+        bankId: null,
         amount: "",
         narration: "",
       });
@@ -126,6 +133,7 @@ const MoneyReceived = () => {
           invoiceNo: result.InvoiceNo,
           invoiceDate: result.invoiceDate,
           customerId: result.customerId,
+          bankId: result.bankId,
           amount: String(result.amount),
           narration: result.narration || "",
         });
@@ -150,12 +158,13 @@ const MoneyReceived = () => {
     try {
       await db.runAsync(
         `UPDATE MoneyReceived
-         SET InvoiceNo = ?, invoiceDate = ?, customerId = ?, amount = ?, narration = ?
+         SET InvoiceNo = ?, invoiceDate = ?, customerId = ?,bankId = ?, amount = ?, narration = ?
          WHERE id = ?`,
         [
           form.invoiceNo,
           form.invoiceDate,
           form.customerId,
+          form.bankId,
           Number(form.amount),
           form.narration,
           selectedInvoiceId,
@@ -170,6 +179,7 @@ const MoneyReceived = () => {
         invoiceNo: "",
         invoiceDate: "",
         customerId: null,
+        bankId: null,
         amount: "",
         narration: "",
       });
@@ -192,6 +202,19 @@ const MoneyReceived = () => {
       }
     };
     loadCustomers();
+
+    const loadBanks = async () => {
+      try {
+        const result = await db.getAllAsync(
+          "SELECT id, bankName FROM Bank ORDER BY bankName",
+        );
+        setBankList(result);
+      } catch (error) {
+        console.error("Error loading customers:", error);
+      }
+    };
+
+    loadBanks();
   }, []);
 
   return (
@@ -250,6 +273,19 @@ const MoneyReceived = () => {
             value={form.amount}
             onChangeText={(t) => setForm({ ...form, amount: t })}
           />
+
+          <Text className='text-base font-medium mt-4 pb-2'>Bank Name</Text>
+          <View className='rounded-lg border border-[#dbe0e6] dark:border-gray-600 bg-white dark:bg-gray-800 px-4 text-base text-black dark:text-white'>
+            <Picker
+              selectedValue={form.bankId}
+              onValueChange={(v) => setForm({ ...form, bankId: v })}
+            >
+              <Picker.Item label='Select Bank Name' value={undefined} />
+              {bankList.map((c) => (
+                <Picker.Item key={c.id} label={c.bankName} value={c.id} />
+              ))}
+            </Picker>
+          </View>
 
           <Text className='text-base font-medium mt-4 pb-2'>Narration</Text>
           <TextInput
@@ -394,7 +430,7 @@ const MoneyReceived = () => {
         <View className='flex items-center bg-white dark:bg-gray-800/50 rounded-xl p-4 w-[85%] relative left-8 top-[1px]'>
           <Link
             href={{
-              pathname: '/Transaction/forms/showMoneyReceived',
+              pathname: "/Transaction/forms/showMoneyReceived",
               params: {
                 refresh: refreshList ? "1" : "0",
               },

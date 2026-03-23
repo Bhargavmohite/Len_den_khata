@@ -63,9 +63,12 @@ export default function RootLayout() {
                 InvoiceNo INTEGER NOT NULL,
                 invoiceDate TEXT NOT NULL,
                 supplyId INTEGER NOT NULL,
+                bankId INTEGER NOT NULL,
                 amount INTEGER NOT NULL,
                 narration TEXT,
-                FOREIGN KEY (supplyId) REFERENCES Supply(id)
+                FOREIGN KEY (supplyId) REFERENCES Supply(id),
+                FOREIGN KEY (bankId) REFERENCES Bank(id)
+
               ); `);
 
             await db.execAsync(`
@@ -85,9 +88,11 @@ export default function RootLayout() {
                 InvoiceNo INTEGER NOT NULL,
                 invoiceDate TEXT NOT NULL,
                 customerId INTEGER NOT NULL,
+                bankId INTEGER NOT NULL,
                 amount INTEGER NOT NULL,
                 narration TEXT,
-                FOREIGN KEY (customerId) REFERENCES Customer(id)
+                FOREIGN KEY (customerId) REFERENCES Customer(id),
+                FOREIGN KEY (bankId) REFERENCES Bank(id)
               );`);
           } catch (error) {}
         }}

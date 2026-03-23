@@ -1,24 +1,24 @@
-import { View, Text, Pressable } from 'react-native'
-import React from 'react'
-import { useRouter } from 'expo-router';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useRouter } from "expo-router";
+import React from "react";
+import { Pressable, Text, View } from "react-native";
 
 const transaction = () => {
-    const router = useRouter();
+  const router = useRouter();
   const purchase = () => {
-    router.push('/Transaction/Purchase');
+    router.push("/Transaction/Purchase");
   };
 
   const sale = () => {
-    router.push('/Transaction/Sales');
+    router.push("/Transaction/Sales");
   };
 
   const money_Received = () => {
-    router.push('/Transaction/MoneyReceived');
+    router.push("/Transaction/MoneyReceived");
   };
 
   const money_Paid = () => {
-    router.push('/Transaction/MoneyPaid');
+    router.push("/Transaction/MoneyPaid");
   };
   return (
     <View className='px-4 py-4 gap-4 mt-2'>
@@ -115,6 +115,6 @@ const transaction = () => {
       </Pressable>
     </View>
   );
-}
+};
 
-export default transaction
+export default transaction;

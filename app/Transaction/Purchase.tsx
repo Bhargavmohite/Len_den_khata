@@ -218,7 +218,10 @@ const Purchase = () => {
     }
   };
   return (
-    <ScrollView className='flex-1 px-4 py-4'>
+    <ScrollView
+      className='flex-1 px-4 py-4 gap-4 mt-2'
+      contentContainerStyle={{ paddingBottom: 240 }}
+    >
       <View className='px-4 py-4'>
         {/* FORM */}
         <View className='w-full max-w-md self-center space-y-5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-8'>
