@@ -1,4 +1,4 @@
-import "@/global.css";
+import '@/global.css';
 import { Stack } from "expo-router";
 import { SQLiteProvider } from "expo-sqlite";
 import { Suspense } from "react";
@@ -57,6 +57,8 @@ export default function RootLayout() {
                 FOREIGN KEY (supplyId) REFERENCES Supply(id)
               ); `);
 
+            // await db.execAsync(`DROP TABLE IF EXISTS MoneyPaid`);
+
             await db.execAsync(`
               CREATE TABLE IF NOT EXISTS MoneyPaid (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,6 +83,8 @@ export default function RootLayout() {
                 narration TEXT,
                 FOREIGN KEY (customerId) REFERENCES Customer(id)
               );`);
+
+            // await db.execAsync(`DROP TABLE IF EXISTS MoneyReceived`);
 
             await db.execAsync(`
               CREATE TABLE IF NOT EXISTS MoneyReceived (

@@ -99,6 +99,7 @@ const money_paid = () => {
       !form.invoiceNo ||
       !form.invoiceDate ||
       !form.supplyId ||
+      !form.bankId ||
       !form.amount
     ) {
       Alert.alert("Alert", "Please fill all required fields");
@@ -109,7 +110,7 @@ const money_paid = () => {
       await db.runAsync(
         `INSERT INTO MoneyPaid 
          (InvoiceNo, invoiceDate, supplyId,bankId,amount, narration)
-         VALUES (?, ?, ?, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?,?)`,
         [
           form.invoiceNo,
           form.invoiceDate,

@@ -74,7 +74,7 @@ const Purchase = () => {
   useEffect(() => {
     const loadSupplies = async () => {
       try {
-        const result = await db.getAllAsync(
+        const result = await db.getAllAsync<{ id: number; supplyName: string }>(
           "SELECT id, supplyName FROM Supply ORDER BY supplyName",
         );
         setSupplyList(result);
@@ -137,7 +137,7 @@ const Purchase = () => {
     setFilterSupplierId(supplierId);
     setSelectedInvoiceId(null);
 
-    const result = await db.getAllAsync(
+    const result = await db.getAllAsync<{ id: number; InvoiceNo: string }>(
       "SELECT id, InvoiceNo FROM Purchase WHERE supplyId = ?",
       [supplierId],
     );
@@ -264,11 +264,13 @@ const Purchase = () => {
           <Text className='text-base font-medium mt-4 pb-2'>Supplier Name</Text>
           <View className='rounded-lg border border-[#dbe0e6] dark:border-gray-600 bg-white dark:bg-gray-800 px-4 text-base text-black dark:text-white'>
             <Picker
-              selectedValue={form?.supplyId || ""}
-              onValueChange={(v) => setForm({ ...form, supplyId: v })}
+              selectedValue={form.supplyId ?? null}
+              onValueChange={(v) =>
+                setForm({ ...form, supplyId: v !== null ? Number(v) : null })
+              }
             >
-              <Picker.Item label='Select Supplier' value='' />
-              {supplyList?.map((s) => (
+              <Picker.Item label='Select Supplier' value={null} />
+              {supplyList.map((s) => (
                 <Picker.Item key={s.id} label={s.supplyName} value={s.id} />
               ))}
             </Picker>

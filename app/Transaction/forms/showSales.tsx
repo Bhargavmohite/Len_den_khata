@@ -1,7 +1,7 @@
-import { View, Text, ActivityIndicator, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useLocalSearchParams } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useLocalSearchParams } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
 type SaleItem = {
   id: number;
@@ -13,7 +13,7 @@ type SaleItem = {
 };
 
 const showSales = () => {
-const { refreshList } = useLocalSearchParams();
+  const { refreshList } = useLocalSearchParams();
 
   const db = useSQLiteContext();
 
@@ -57,7 +57,6 @@ const { refreshList } = useLocalSearchParams();
     );
   }
 
-
   return (
     <FlatList
       className='p-2'
@@ -98,6 +97,6 @@ const { refreshList } = useLocalSearchParams();
       )}
     />
   );
-}
+};
 
-export default showSales
+export default showSales;

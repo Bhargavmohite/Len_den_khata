@@ -1,7 +1,7 @@
-import { View, Text, ActivityIndicator, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useLocalSearchParams } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useLocalSearchParams } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
 type MoneyReceivedItem = {
   id: number;
@@ -13,14 +13,14 @@ type MoneyReceivedItem = {
 };
 
 const showMoneyReceived = () => {
- const { refreshList } = useLocalSearchParams();
- const db = useSQLiteContext();
-const [sales, setSales] = useState<MoneyReceivedItem[]>([]);
- const [loading, setLoading] = useState(false);
+  const { refreshList } = useLocalSearchParams();
+  const db = useSQLiteContext();
+  const [sales, setSales] = useState<MoneyReceivedItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
- const loadSalesDetails = async () => {
-   try {
-     const result = await db.getAllAsync(`
+  const loadSalesDetails = async () => {
+    try {
+      const result = await db.getAllAsync(`
                 SELECT 
                   S.id,
                   S.InvoiceNo,
@@ -32,25 +32,25 @@ const [sales, setSales] = useState<MoneyReceivedItem[]>([]);
                   LEFT JOIN Customer C ON S.customerId = C.id
                   ORDER BY S.invoiceDate DESC
               `);
-     setSales(result);
-   } catch (error) {
-     console.error("listing error in sales", error);
-   } finally {
-     setLoading(false);
-   }
- };
+      setSales(result);
+    } catch (error) {
+      console.error("listing error in sales", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
- useEffect(() => {
-   loadSalesDetails();
- }, [refreshList]);
+  useEffect(() => {
+    loadSalesDetails();
+  }, [refreshList]);
 
- if (loading) {
-   return (
-     <View className='flex-1 justify-center items-center'>
-       <ActivityIndicator size='large' />
-     </View>
-   );
- }
+  if (loading) {
+    return (
+      <View className='flex-1 justify-center items-center'>
+        <ActivityIndicator size='large' />
+      </View>
+    );
+  }
   return (
     <FlatList
       className='p-2'
@@ -103,6 +103,6 @@ const [sales, setSales] = useState<MoneyReceivedItem[]>([]);
       )}
     />
   );
-}
+};
 
-export default showMoneyReceived
+export default showMoneyReceived;

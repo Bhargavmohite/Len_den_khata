@@ -56,6 +56,11 @@ const showPurchase = () => {
     );
   }
 
+  const totalAmount = purchase.reduce(
+    (sum, item) => sum + (item.amount || 0),
+    0,
+  );
+
   return (
     <FlatList
       className='p-2'
@@ -91,6 +96,16 @@ const showPurchase = () => {
               ₹{item.amount || 0}
             </Text>
           </View>
+        </View>
+      )}
+      ListFooterComponent={() => (
+        <View className='mx-4 my-4 p-4 bg-gray-100 rounded-2xl shadow-sm'>
+          <Text className='text-sm text-green-700 font-semibold'>
+            Total Balance
+          </Text>
+          <Text className='text-lg font-bold text-green-800'>
+            ₹{totalAmount}
+          </Text>
         </View>
       )}
       ListEmptyComponent={() => (
