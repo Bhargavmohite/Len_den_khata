@@ -24,7 +24,7 @@ const CustomerWiseReport = () => {
             C.customerName,
             COALESCE(S.totalSales, 0) as sales,
             COALESCE(M.totalReceived, 0) as received,
-            (COALESCE(S.totalSales, 0) - COALESCE(M.totalReceived, 0)) as balance
+            (COALESCE(M.totalReceived, 0) - COALESCE(S.totalSales, 0)) as balance
           FROM Customer C
           LEFT JOIN (
             SELECT customerId, SUM(amount) as totalSales
@@ -71,30 +71,29 @@ const CustomerWiseReport = () => {
           {data.length > 0 ? (
             data.map((item) => (
               <View
-                 key={item.id}
-                 className='flex-row p-3 border-t border-gray-100 items-center gap-2'
-               >
-                 <Text
-                   className='flex-1 text-gray-800'
-                   numberOfLines={1}
-                   ellipsizeMode='tail'
-                 >
-                   {item.customerName}
-                 </Text>
- 
-                 <Text className='flex-1 text-right text-blue-600 font-semibold'>
-                   ₹{item.sales}
-                 </Text>
- 
-                 <Text className='flex-1 text-right text-green-600 font-semibold'>
-                   ₹{item.received}
-                 </Text>
- 
-                 <Text className='flex-1 text-right text-red-600 font-bold'>
-                   ₹{item.balance}
-                 </Text>
-               </View>
- 
+                key={item.id}
+                className='flex-row p-3 border-t border-gray-100 items-center gap-2'
+              >
+                <Text
+                  className='flex-1 text-gray-800'
+                  numberOfLines={1}
+                  ellipsizeMode='tail'
+                >
+                  {item.customerName}
+                </Text>
+
+                <Text className='flex-1 text-right text-blue-600 font-semibold'>
+                  ₹{item.sales}
+                </Text>
+
+                <Text className='flex-1 text-right text-green-600 font-semibold'>
+                  ₹{item.received}
+                </Text>
+
+                <Text className='flex-1 text-right text-red-600 font-bold'>
+                  ₹{item.balance}
+                </Text>
+              </View>
             ))
           ) : (
             <View className='items-center py-10'>

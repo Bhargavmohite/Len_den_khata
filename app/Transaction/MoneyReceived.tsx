@@ -111,7 +111,7 @@ const MoneyReceived = () => {
         [customerId],
       );
 
-      setInvoiceList(result);
+      setInvoiceList(result as { id: number; InvoiceNo: string }[]);
     } catch (error) {
       console.error("Error loading invoices:", error);
     }
@@ -196,7 +196,7 @@ const MoneyReceived = () => {
         const result = await db.getAllAsync(
           "SELECT id, customerName FROM Customer ORDER BY customerName",
         );
-        setCustomerList(result);
+        setCustomerList(result as { id: number; customerName: string }[]);
       } catch (error) {
         console.error("Error loading customers:", error);
       }
@@ -208,7 +208,7 @@ const MoneyReceived = () => {
         const result = await db.getAllAsync(
           "SELECT id, bankName FROM Bank ORDER BY bankName",
         );
-        setBankList(result);
+        setBankList(result as { id: number; bankName: string }[]);
       } catch (error) {
         console.error("Error loading customers:", error);
       }

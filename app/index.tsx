@@ -4,9 +4,9 @@ import database from "./Database/exportDatabase";
 
 export default function Index() {
   const router = useRouter();
-  const nextpage = () => {
-    return router.navigate("./(user)");
-  };
+const nextpage = () => {
+  router.push("/(user)"); 
+};
 
   return (
     <View className=' flex-1 items-center justify-center'>

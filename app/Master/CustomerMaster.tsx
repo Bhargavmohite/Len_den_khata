@@ -263,7 +263,7 @@ const CustomerMaster = () => {
                       setSelectedCustomerId(Number(id));
                       setForm({
                         customerName: customer.customerName,
-                        MBCountryCode: customer.MBCountrycode || "+91",
+                        MBCountryCode: customer.MBCountryCode || "+91",
                         mobileNumber: String(customer.mobileNumber),
                         email: customer.email,
                         creditLimit: String(customer.creditLimit),

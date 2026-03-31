@@ -32,7 +32,7 @@ const showMoneyReceived = () => {
                   LEFT JOIN Customer C ON S.customerId = C.id
                   ORDER BY S.invoiceDate DESC
               `);
-      setSales(result);
+      setSales(result as MoneyReceivedItem[]);
     } catch (error) {
       console.error("listing error in sales", error);
     } finally {

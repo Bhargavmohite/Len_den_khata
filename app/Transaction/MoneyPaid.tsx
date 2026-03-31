@@ -70,7 +70,7 @@ const money_paid = () => {
   useEffect(() => {
     const loadSupplies = async () => {
       try {
-        const result = await db.getAllAsync(
+        const result = await db.getAllAsync<{ id: number; supplyName: string }>(
           "SELECT id, supplyName FROM Supply ORDER BY supplyName",
         );
         setSupplyList(result);
@@ -82,7 +82,7 @@ const money_paid = () => {
 
     const loadsBanks = async () => {
       try {
-        const result = await db.getAllAsync(
+        const result = await db.getAllAsync<{ id: number; bankName: string }>(
           "SELECT id, bankName FROM Bank ORDER BY bankName",
         );
         setBankList(result);
@@ -144,7 +144,7 @@ const money_paid = () => {
       setFilterSupplierId(supplierId);
       setSelectedInvoiceId(null);
 
-      const result = await db.getAllAsync(
+      const result = await db.getAllAsync<{ id: number; InvoiceNo: string }>(
         "SELECT id, InvoiceNo FROM MoneyPaid WHERE supplyId = ?",
         [supplierId],
       );

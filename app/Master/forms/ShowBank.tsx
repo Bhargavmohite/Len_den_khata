@@ -8,14 +8,14 @@ type Bank = {
   openingBalance: string; // keep consistent with DB column
 };
 
-const ShowBank = ({ refreshList }) => {
-  const [banklists, setbankLists] = useState();
+const ShowBank = ({ refreshList }: { refreshList: any }) => {
+  const [banklists, setbankLists] = useState<Bank[]>([]);
 
   const db = useSQLiteContext();
 
   const loadbank = async () => {
     try {
-      const result = await db.getAllAsync("SELECT * FROM Bank");
+      const result = await db.getAllAsync<Bank>("SELECT * FROM Bank");
       setbankLists(result);
     } catch (error) {
       console.log("Failed to load bank");
@@ -45,7 +45,7 @@ const ShowBank = ({ refreshList }) => {
           {/* Opening Balance */}
           <View className='flex-row justify-between items-center'>
             <Text className='text-sm text-gray-500'>
-              Opening Balance : ₹ {item.OpeningBalance}
+              Opening Balance : ₹ {item.openingBalance}
             </Text>
 
             {/* <Text

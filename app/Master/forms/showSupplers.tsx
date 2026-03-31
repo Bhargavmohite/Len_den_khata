@@ -5,7 +5,7 @@ import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
 const showSupplers = () => {
   const { refreshList } = useLocalSearchParams();
-  const [supplyList, setSupplyList] = useState();
+  const [supplyList, setSupplyList] = useState<any[]>([]);
   const [isloading, setIsloading] = useState(false);
   const db = useSQLiteContext();
 
