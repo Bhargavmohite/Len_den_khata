@@ -4,7 +4,7 @@ import React from "react";
 import FontAwesome5  from "@expo/vector-icons/FontAwesome5";
 import Foundation from "@expo/vector-icons/Foundation";
 
-const tabroot = () => {
+const Tabroot = () => {
   return (
     <Tabs>
       <Tabs.Screen
@@ -38,4 +38,4 @@ const tabroot = () => {
   );
 };
 
-export default tabroot;
+export default Tabroot;

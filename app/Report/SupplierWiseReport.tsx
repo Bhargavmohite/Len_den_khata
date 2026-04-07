@@ -50,6 +50,7 @@ const SupplierWiseReport = () => {
 
   return (
     <View className='flex-1 bg-gray-100 p-4'>
+      
       {/* 📊 Table */}
       <View className='bg-white rounded-2xl border border-gray-200 overflow-hidden'>
         {/* Header columns */}
