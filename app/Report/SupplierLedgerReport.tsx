@@ -1,7 +1,15 @@
 import { Picker } from "@react-native-picker/picker";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import {
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const SupplierLedgerReport = () => {
   const db = useSQLiteContext();
@@ -97,6 +105,63 @@ const SupplierLedgerReport = () => {
     }
   }, [form.supplyId]);
 
+  const GenratePDF = async () => {
+    if (!form.supplyId || filteredRows.length === 0) {
+      alert("No data to print");
+      return;
+    }
+
+    // 📄 Build HTML Table
+    const html = `
+    <html>
+      <body>
+        <h2 style="text-align:center;">Supplier Ledger</h2>
+        <h3 style="text-align:center;">
+        Supplier Name :
+        ${supplyList.find(
+          (item) => item.id === form.supplyId,
+        )?.supplyName}
+        </h3>
+
+        <table border="1" style="width:100%; border-collapse: collapse;">
+          <tr>
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Purchase</th>
+            <th>Paid</th>
+            <th>Balance</th>
+          </tr>
+
+          ${filteredRows
+            .map(
+              (item) => `
+            <tr>
+              <td>${item.date.split("-").reverse().join("/")}</td>
+              <td>${item.InvoiceNo}</td>
+              <td>${item.purchase}</td>
+              <td>${item.paid}</td>
+              <td>${item.balance}</td>
+            </tr>
+          `,
+            )
+            .join("")}
+        </table>
+      </body>
+    </html>
+  `;
+
+    try {
+      const { uri } = await Print.printToFileAsync({
+        html,
+      });
+
+      // 📥 Download / Share
+      await Sharing.shareAsync(uri);
+    } catch (error) {
+      console.error("PDF Error:", error);
+    }
+  };
+
   return (
     <>
       {/* Supplier Picker */}
@@ -153,6 +218,16 @@ const SupplierLedgerReport = () => {
             <Text className='flex-1 p-2 border-r text-xs'>{item.balance}</Text>
           </View>
         ))}
+
+        <View>
+          {/* <Text>Button to print</Text> */}
+          <TouchableOpacity
+            onPress={GenratePDF}
+            className='bg-blue-500 px-4 py-2 rounded mt-4 items-center'
+          >
+            <Text className='text-white'>Download PDF</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </>
   );

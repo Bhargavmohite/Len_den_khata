@@ -1,7 +1,10 @@
 import { Picker } from "@react-native-picker/picker";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, View, TextInput } from "react-native";
+import { ScrollView, Text, TextInput, View } from "react-native";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
+import { TouchableOpacity } from "react-native";
 
 const CustomerLedgerReport = () => {
   const db = useSQLiteContext();
@@ -93,6 +96,77 @@ const CustomerLedgerReport = () => {
     return date.split("-").reverse().join("-");
   };
 
+
+  const GeneratePDF = async () => {
+    if (!form.customerId || filteredRows.length === 0) {
+      alert("No data to export");
+      return;
+    }
+
+      const customerName = customerList.find((c) => c.id === form.customerId)?.customerName || "";
+      const totalSales = filteredRows.reduce((a, b) => a + b.sales, 0);
+      const totalReceived = filteredRows.reduce((a, b) => a + b.received, 0);
+      const finalBalance = filteredRows.at(-1)?.balance || 0;
+
+        const html = `
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial; padding: 10px; }
+          h2 { text-align: center; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+          th { background-color: #f2f2f2; }
+        </style>
+      </head>
+
+      <body>
+        <h2>Customer Ledger Report</h2>
+        <h4>Customer: ${customerName}</h4>
+
+        <table>
+          <tr>
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Sales</th>
+            <th>Received</th>
+            <th>Balance</th>
+          </tr>
+
+          ${filteredRows
+            .map(
+              (item) => `
+              <tr>
+                <td>${formatDate(item.date)}</td>
+                <td>${item.InvoiceNo}</td>
+                <td>${item.sales}</td>
+                <td>${item.received}</td>
+                <td>${item.balance}</td>
+              </tr>
+            `,
+            )
+            .join("")}
+        </table>
+
+        <br/>
+
+        <h4>Summary</h4>
+        <p>Total Sales: ${totalSales}</p>
+        <p>Total Received: ${totalReceived}</p>
+        <p>Final Balance: ${finalBalance}</p>
+      </body>
+    </html>
+  `;
+
+  try {
+    const { uri } = await Print.printToFileAsync({ html });
+
+    await Sharing.shareAsync(uri);
+  } catch (error) {
+    console.error("PDF Error:", error);
+  }
+
+  }
   return (
     <>
       {/* Customer Picker */}
@@ -150,6 +224,13 @@ const CustomerLedgerReport = () => {
             <Text className='flex-1 p-2 border-r text-xs'>{item.balance}</Text>
           </View>
         ))}
+
+        <TouchableOpacity
+          onPress={GeneratePDF}
+          className='bg-blue-500 px-4 py-2 rounded mt-4 items-center'
+        >
+          <Text className='text-white'>Download PDF</Text>
+        </TouchableOpacity>
       </ScrollView>
     </>
   );
