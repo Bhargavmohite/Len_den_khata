@@ -35,14 +35,11 @@ const CustomerMaster = () => {
   });
 
   const [customerLists, setCustomerLists] = useState<Customer[]>([]);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(
-    null,
-  );
-  //   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number>(-1);
   const [isModalVisible1, setIsModalVisible1] = useState(false);
   const [refreshList, setRefreshList] = useState(false);
 
-  // ✅ Load Customers
+
   const loadCustomers = async () => {
     try {
       const result = await db.getAllAsync<Customer>("SELECT * FROM Customer");
@@ -56,7 +53,7 @@ const CustomerMaster = () => {
     loadCustomers();
   }, [refreshList]);
 
-  // ✅ Submit
+
   const handleSubmit = async () => {
     try {
       if (
@@ -70,13 +67,13 @@ const CustomerMaster = () => {
         return;
       }
 
-      // Email validation
+
       if (!/\S+@\S+\.\S+/.test(form.email)) {
         Alert.alert("Invalid email");
         return;
       }
 
-      // Duplicate name check
+      
       const exists = await db.getFirstAsync<Customer>(
         `SELECT * FROM Customer WHERE LOWER(TRIM(customerName)) = ?`,
         [form.customerName.trim().toLowerCase()],
@@ -118,9 +115,9 @@ const CustomerMaster = () => {
     }
   };
 
-  // ✅ Update
+
   const handleUpdate = async () => {
-    if (selectedCustomerId === null) {
+    if (selectedCustomerId === -1) {
       Alert.alert("Select customer first");
       return;
     }
@@ -164,11 +161,11 @@ const CustomerMaster = () => {
   return (
     <ScrollView className='flex-1 px-4 py-4'>
       <View className='p-4'>
-        {/* FORM */}
+
         <View className='bg-white p-5 rounded-xl gap-2'>
           <Text>Customer Name</Text>
           <TextInput
-            value={form.customerName}
+            value={String(form.customerName ?? "")}
             placeholder='Customer Name'
             onChangeText={(t) => setForm({ ...form, customerName: t })}
             className='w-full h-14 rounded-lg border border-[#dbe0e6] dark:border-gray-600 bg-white dark:bg-gray-800 px-4 text-base text-black dark:text-white'
@@ -177,13 +174,13 @@ const CustomerMaster = () => {
           <Text>Mobile</Text>
           <View className='flex-row gap-2'>
             <TextInput
-              value={form.MBCountryCode}
+              value={String(form.MBCountryCode ?? "")}
               placeholder='code'
               onChangeText={(t) => setForm({ ...form, MBCountryCode: t })}
               className='w-16 h-14 rounded-lg border border-[#dbe0e6] bg-white text-center'
             />
             <TextInput
-              value={form.mobileNumber}
+              value={String(form.mobileNumber ?? "")}
               placeholder='Mobile number'
               keyboardType='phone-pad'
               onChangeText={(t) =>
@@ -198,7 +195,7 @@ const CustomerMaster = () => {
 
           <Text>Email</Text>
           <TextInput
-            value={form.email}
+            value={String(form.email ?? "")}
             placeholder='Email'
             onChangeText={(t) => setForm({ ...form, email: t })}
             className='w-full h-14 rounded-lg border border-[#dbe0e6] dark:border-gray-600 bg-white dark:bg-gray-800 px-4 text-base text-black dark:text-white'
@@ -206,7 +203,7 @@ const CustomerMaster = () => {
 
           <Text>Credit Limit</Text>
           <TextInput
-            value={form.creditLimit}
+            value={String(form.creditLimit ?? "")}
             placeholder='Credit Limit'
             keyboardType='numeric'
             onChangeText={(t) => setForm({ ...form, creditLimit: t })}
@@ -215,7 +212,7 @@ const CustomerMaster = () => {
 
           <Text>Credit Period</Text>
           <TextInput
-            value={form.creditPeriod}
+            value={String(form.creditPeriod ?? "")}
             placeholder='Credit period'
             keyboardType='numeric'
             onChangeText={(t) => setForm({ ...form, creditPeriod: t })}
@@ -223,133 +220,69 @@ const CustomerMaster = () => {
           />
         </View>
 
-        {/* BUTTONS */}
+
         <View className='flex-row justify-center gap-4 mt-4'>
           <Button title='Submit' onPress={handleSubmit} />
           <Button title='Modify' onPress={() => setIsModalVisible1(true)} />
         </View>
 
-        {/* MODAL */}
-        <View>
-          <Modal
-            visible={isModalVisible1}
-            transparent
-            animationType='fade'
-            onRequestClose={() => setIsModalVisible1(false)}
-          >
-            <View className='flex-1 justify-center items-center bg-black/40'>
-              <View className='w-[90%] rounded-xl bg-white p-5 dark:bg-gray-800'>
-                <Text className='text-lg font-semibold text-black dark:text-white mb-4'>
-                  Modify Customer
-                </Text>
+        <Modal
+          visible={isModalVisible1}
+          transparent
+          animationType='fade'
+          onRequestClose={() => setIsModalVisible1(false)}
+        >
+          <View className='flex-1 justify-center items-center bg-black/40'>
+            <View className='w-[90%] rounded-xl bg-white p-5 dark:bg-gray-800'>
+              <Text className='text-lg font-semibold mb-4'>
+                Modify Customer
+              </Text>
 
-                {/* Customer Name Dropdown */}
-                <Text className='mb-2 text-black dark:text-white'>
-                  Customer Name
-                </Text>
+              <View className='h-14 mb-3 justify-center rounded-lg border'>
+                <Picker
+                  selectedValue={selectedCustomerId}
+                  onValueChange={(id) => {
+                    if (id === -1) return;
 
-                <View className='h-14 mb-3 justify-center rounded-lg border border-[#dbe0e6] dark:border-gray-600'>
-                  <Picker
-                    selectedValue={selectedCustomerId}
-                    onValueChange={(id) => {
-                      if (!id) return;
+                    const customer = customerLists.find(
+                      (c) => Number(c.id) === Number(id)
+                    );
 
-                      const customer = customerLists.find(
-                        (c) => Number(c.id) === Number(id),
-                      );
+                    if (!customer) return;
 
-                      if (!customer) return;
+                    setSelectedCustomerId(Number(id));
+                    setForm({
+                      customerName: customer.customerName ?? "",
+                      MBCountryCode: customer.MBCountryCode ?? "+91",
+                      mobileNumber: String(customer.mobileNumber ?? ""),
+                      email: customer.email ?? "",
+                      creditLimit: String(customer.creditLimit ?? ""),
+                      creditPeriod: String(customer.creditPeriod ?? ""),
+                    });
+                  }}
+                >
+                  <Picker.Item label='Select Customer' value={-1} />
+                  {customerLists.map((customer) => (
+                    <Picker.Item
+                      key={customer.id}
+                      label={customer.customerName}
+                      value={customer.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
 
-                      setSelectedCustomerId(Number(id));
-                      setForm({
-                        customerName: customer.customerName,
-                        MBCountryCode: customer.MBCountryCode || "+91",
-                        mobileNumber: String(customer.mobileNumber),
-                        email: customer.email,
-                        creditLimit: String(customer.creditLimit),
-                        creditPeriod: String(customer.creditPeriod),
-                      });
-                    }}
-                  >
-                    <Picker.Item label='Select Customer' value={null} />
-                    {customerLists.map((customer) => (
-                      <Picker.Item
-                        key={customer.id}
-                        label={customer.customerName}
-                        value={customer.id}
-                      />
-                    ))}
-                  </Picker>
-                </View>
-
-                {/* Mobile Number */}
-                <View className='flex-row gap-2'>
-                  <TextInput
-                    className='w-16 h-12 border rounded-lg text-center'
-                    value={form.MBCountryCode}
-                    onChangeText={(t) => setForm({ ...form, MBCountryCode: t })}
-                  />
-
-                  <TextInput
-                    className='flex-1 h-12 border rounded-lg px-4'
-                    keyboardType='phone-pad'
-                    value={form.mobileNumber}
-                    onChangeText={(t) =>
-                      setForm({
-                        ...form,
-                        mobileNumber: t.replace(/\D/g, "").slice(0, 10),
-                      })
-                    }
-                  />
-                </View>
-
-                {/* Email */}
-                <TextInput
-                  placeholder='Email'
-                  keyboardType='email-address'
-                  className='h-14 mb-3 rounded-lg border border-[#dbe0e6] px-4 text-black dark:text-white'
-                  value={form.email}
-                  onChangeText={(text) => setForm({ ...form, email: text })}
-                />
-
-                {/* Credit Limit */}
-                <TextInput
-                  placeholder='Credit Limit'
-                  keyboardType='numeric'
-                  className='h-14 mb-3 rounded-lg border border-[#dbe0e6] px-4 text-black dark:text-white'
-                  value={form.creditLimit}
-                  onChangeText={(text) =>
-                    setForm({ ...form, creditLimit: text })
-                  }
-                />
-
-                {/* Credit Period */}
-                <TextInput
-                  placeholder='Credit Period (Days)'
-                  keyboardType='numeric'
-                  className='h-14 mb-4 rounded-lg border border-[#dbe0e6] px-4 text-black dark:text-white'
-                  value={form.creditPeriod}
-                  onChangeText={(text) =>
-                    setForm({ ...form, creditPeriod: text })
-                  }
-                />
-
-                <View className='flex-row justify-between'>
-                  <Button title='Update' onPress={handleUpdate} />
-                </View>
+              <View className='flex-row justify-between'>
+                <Button title='Update' onPress={handleUpdate} />
               </View>
             </View>
-          </Modal>
-        </View>
-
-        {/* NAVIGATION */}
+          </View>
+        </Modal>
         <View className='mt-6 items-centerflex items-center bg-white dark:bg-gray-800/50 rounded-xl p-4 w-[85%] relative left-8 top-[2rem]'>
           <Link
             href={{
               pathname: "/Master/forms/showCustomers",
-              params: {
-                refresh: refreshList ? "1" : "0",
-              },
+              params: { refresh: refreshList ? "1" : "0" },
             }}
             asChild
           >

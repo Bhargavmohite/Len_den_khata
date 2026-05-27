@@ -3,7 +3,6 @@ import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
-// ✅ Proper type
 type Customer = {
   id: number;
   customerName: string;
@@ -13,9 +12,11 @@ type Customer = {
   creditLimit: string;
   creditPeriod: string;
 };
-const showCustomers = () => {
-  const { refreshList } = useLocalSearchParams();
+
+const ShowCustomers = () => {
+  const { refresh } = useLocalSearchParams();
   const db = useSQLiteContext();
+
   const [customerList, setCustomerList] = useState<Customer[]>([]);
   const [isloading, setIsloading] = useState(true);
 
@@ -37,7 +38,7 @@ const showCustomers = () => {
 
   useEffect(() => {
     loadCustomerList();
-  }, [refreshList]);
+  }, [refresh]);
 
   if (isloading) {
     return (
@@ -55,30 +56,31 @@ const showCustomers = () => {
       contentContainerStyle={{ paddingBottom: 30 }}
       renderItem={({ item }) => (
         <View className='mx-4 my-2 p-4 bg-white rounded-2xl shadow-sm'>
-          {/* Header */}
           <View className='flex-row justify-between items-center mb-2'>
             <Text className='text-lg font-bold text-blue-600'>
-              🧔 {item.customerName}
+              🧔 {String(item.customerName ?? "")}
             </Text>
-            <Text className='text-xs text-gray-400'>ID: {item.id}</Text>
+            <Text className='text-xs text-gray-400'>
+              ID: {String(item.id ?? "")}
+            </Text>
           </View>
 
-          {/* Mobile */}
           <Text className='text-gray-700 mb-1'>
-            📞 {item.MBCountryCode} {item.mobileNumber}
+            📞 {String(item.MBCountryCode ?? "")}{" "}
+            {String(item.mobileNumber ?? "")}
           </Text>
 
-          {/* Email */}
-          <Text className='text-gray-600 mb-3'>✉️ {item.email}</Text>
+          <Text className='text-gray-600 mb-3'>
+            ✉️ {String(item.email ?? "")}
+          </Text>
 
-          {/* Credit Info */}
           <View className='flex-row justify-between bg-blue-50 p-3 rounded-xl'>
             <View>
               <Text className='text-xs text-blue-500 uppercase font-semibold'>
                 Credit Limit
               </Text>
               <Text className='text-base font-bold text-blue-700'>
-                ₹{item.creditLimit}
+                ₹{String(item.creditLimit ?? "")}
               </Text>
             </View>
 
@@ -87,7 +89,7 @@ const showCustomers = () => {
                 Period
               </Text>
               <Text className='text-base font-bold text-gray-700'>
-                {item.creditPeriod} Days
+                {String(item.creditPeriod ?? "")} Days
               </Text>
             </View>
           </View>
@@ -102,4 +104,4 @@ const showCustomers = () => {
   );
 };
 
-export default showCustomers;
+export default ShowCustomers;

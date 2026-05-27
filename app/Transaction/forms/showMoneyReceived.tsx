@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
 type MoneyReceivedItem = {
+  bankName: string;
   id: number;
   InvoiceNo: string;
   invoiceDate: string;
@@ -21,16 +22,20 @@ const showMoneyReceived = () => {
   const loadSalesDetails = async () => {
     try {
       const result = await db.getAllAsync(`
-                SELECT 
-                  S.id,
-                  S.InvoiceNo,
-                  S.invoiceDate,
-                  S.amount,
-                  S.narration,
-                  C.customerName
-                  FROM MoneyReceived S
-                  LEFT JOIN Customer C ON S.customerId = C.id
-                  ORDER BY S.invoiceDate DESC
+         SELECT 
+          S.id,
+          S.bankId,
+          S.InvoiceNo,
+          S.invoiceDate,
+          S.amount,
+          S.narration,
+          C.customerName,
+          B.bankName
+        FROM MoneyReceived S
+        LEFT JOIN Customer C ON S.customerId = C.id
+        LEFT JOIN Bank B ON S.bankId = B.id
+        ORDER BY S.invoiceDate DESC
+               
               `);
       setSales(result as MoneyReceivedItem[]);
     } catch (error) {
@@ -77,6 +82,11 @@ const showMoneyReceived = () => {
             {/* Customer */}
             <Text className='text-gray-800 font-semibold mb-1'>
               🧔 {item.customerName || "Unknown Customer"}
+            </Text>
+
+            {/* Bank */}
+            <Text className='text-gray-800 font-semibold mb-1'>
+              🏦 {item.bankName || "Unknown Bank"}
             </Text>
 
             {/* Narration */}

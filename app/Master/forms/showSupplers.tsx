@@ -3,8 +3,8 @@ import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
-const showSupplers = () => {
-  const { refreshList } = useLocalSearchParams();
+const ShowSupplers = () => {
+  const { refresh } = useLocalSearchParams();
   const [supplyList, setSupplyList] = useState<any[]>([]);
   const [isloading, setIsloading] = useState(false);
   const db = useSQLiteContext();
@@ -12,7 +12,7 @@ const showSupplers = () => {
   const loadSupplier = async () => {
     try {
       setIsloading(true);
-      const result = await db.getAllAsync("SELECT * FROM Supply ");
+      const result = await db.getAllAsync("SELECT * FROM Supply");
       setSupplyList(result);
     } catch (error) {
       console.log("Database Error :", error);
@@ -23,7 +23,7 @@ const showSupplers = () => {
 
   useEffect(() => {
     loadSupplier();
-  }, [refreshList]);
+  }, [refresh]);
 
   if (isloading) {
     return (
@@ -37,34 +37,44 @@ const showSupplers = () => {
     <FlatList
       className='p-2 shadow-lm'
       data={supplyList}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => String(item.id)}
       contentContainerStyle={{ paddingBottom: 30 }}
       renderItem={({ item }) => (
         <View className='mx-4 my-2 p-4 bg-white rounded-2xl shadow-sm'>
-          {/* Header */}
+
           <View className='flex-row justify-between items-center mb-2'>
             <Text className='text-lg font-bold text-blue-600'>
-              🧔 {item.supplyName}
+              🧔 {String(item.supplyName ?? "")}
             </Text>
-            <Text className='text-xs text-gray-400'>ID: {item.id}</Text>
+            <Text className='text-xs text-gray-400'>
+              ID: {String(item.id ?? "")}
+            </Text>
+
           </View>
 
-          {/* Mobile */}
+
           <Text className='text-gray-700 mb-1'>
-            📞 {item.MBCountryCode} {item.mobileNumber}
+            📞 {String(item.MBCountryCode ?? "")}{" "}
+            {String(item.mobileNumber ?? "")}
           </Text>
 
-          {/* Email */}
-          <Text className='text-gray-600 mb-3'>✉️ {item.email}</Text>
+          <Text className='text-gray-600 mb-3'>
+            ✉️ {String(item.email ?? "")}
+          </Text>
 
-          {/* Credit Info */}
+
+
+
+
+
+
           <View className='flex-row justify-between bg-blue-50 p-3 rounded-xl'>
             <View>
               <Text className='text-xs text-blue-500 uppercase font-semibold'>
                 Credit Limit
               </Text>
               <Text className='text-base font-bold text-blue-700'>
-                ₹{item.creditLimit}
+                ₹{String(item.creditLimit ?? "")}
               </Text>
             </View>
 
@@ -73,7 +83,7 @@ const showSupplers = () => {
                 Period
               </Text>
               <Text className='text-base font-bold text-gray-700'>
-                {item.creditPeriod} Days
+                {String(item.creditPeriod ?? "")} Days
               </Text>
             </View>
           </View>
@@ -88,4 +98,4 @@ const showSupplers = () => {
   );
 };
 
-export default showSupplers;
+export default ShowSupplers;

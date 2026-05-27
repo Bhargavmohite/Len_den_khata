@@ -12,8 +12,8 @@ type Purchase = {
   supplyName: string | null;
 };
 
-const showPurchase = () => {
-  const { refreshList } = useLocalSearchParams();
+const ShowPurchase = () => {
+  const { refresh } = useLocalSearchParams(); // ✅ FIXED param name
   const db = useSQLiteContext();
 
   const [purchase, setPurchase] = useState<Purchase[]>([]);
@@ -33,12 +33,13 @@ const showPurchase = () => {
           S.supplyName
         FROM Purchase P
         LEFT JOIN Supply S ON P.supplyId = S.id
-        ORDER BY P.invoiceDate DESC
+        ORDER BY P.id DESC
       `);
 
-      setPurchase(result || []);
+      setPurchase(Array.isArray(result) ? result : []); // ✅ SAFE GUARD
     } catch (error) {
       console.error("listing error in purchase", error);
+      setPurchase([]); // ✅ prevent crash if query fails
     } finally {
       setLoading(false);
     }
@@ -46,7 +47,7 @@ const showPurchase = () => {
 
   useEffect(() => {
     loadPurchaseDetails();
-  }, [refreshList]);
+  }, [refresh]);
 
   if (loading) {
     return (
@@ -57,7 +58,7 @@ const showPurchase = () => {
   }
 
   const totalAmount = purchase.reduce(
-    (sum, item) => sum + (item.amount || 0),
+    (sum, item) => sum + Number(item.amount || 0), // ✅ SAFE NUMBER
     0,
   );
 
@@ -65,9 +66,7 @@ const showPurchase = () => {
     <FlatList
       className='p-2'
       data={purchase}
-      keyExtractor={(item, index) =>
-        item?.id ? item.id.toString() : index.toString()
-      }
+      keyExtractor={(item) => item.id.toString()} // ✅ simplified
       contentContainerStyle={{ paddingBottom: 30 }}
       renderItem={({ item }) => (
         <View className='mx-4 my-2 p-4 bg-white rounded-2xl shadow-sm'>
@@ -93,7 +92,7 @@ const showPurchase = () => {
               Amount
             </Text>
             <Text className='text-base font-bold text-green-700'>
-              ₹{item.amount || 0}
+              ₹{Number(item.amount || 0)}
             </Text>
           </View>
         </View>
@@ -117,4 +116,4 @@ const showPurchase = () => {
   );
 };
 
-export default showPurchase;
+export default ShowPurchase;

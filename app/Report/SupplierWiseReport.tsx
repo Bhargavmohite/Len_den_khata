@@ -14,7 +14,6 @@ const SupplierWiseReport = () => {
   const db = useSQLiteContext();
   const [data, setData] = useState<Row[]>([]);
 
-  // 🔹 Load Supplier-wise Report
   useEffect(() => {
     const loadReport = async () => {
       try {
@@ -50,19 +49,18 @@ const SupplierWiseReport = () => {
 
   return (
     <View className='flex-1 bg-gray-100 p-4'>
-      
-      {/* 📊 Table */}
+      {/* Table */}
       <View className='bg-white rounded-2xl border border-gray-200 overflow-hidden'>
-        {/* Header columns */}
-        <View className='flex-row items-center bg-gray-200 p-3'>
-          <Text className='w-15 font-bold text-gray-700'>Supplier</Text>
-          <Text className='w-24 text-right font-bold text-gray-700 relative left-3'>
+        {/* Header */}
+        <View className='flex-row bg-gray-200 p-3'>
+          <Text className='flex-2 font-bold text-gray-700'>Supplier</Text>
+          <Text className='flex-1 text-right font-bold text-gray-700'>
             Purchase
           </Text>
-          <Text className='w-24 text-right font-bold text-gray-700 relative right-3'>
+          <Text className='flex-1 text-right font-bold text-gray-700'>
             Paid
           </Text>
-          <Text className='w-24 text-right font-bold text-gray-700 relative right-3'>
+          <Text className='flex-1 text-right font-bold text-gray-700'>
             Balance
           </Text>
         </View>
@@ -73,13 +71,9 @@ const SupplierWiseReport = () => {
             data.map((item) => (
               <View
                 key={item.id}
-                className='flex-row p-3 border-t border-gray-100 items-center'
+                className='flex-row p-3 border-t border-gray-100'
               >
-                <Text
-                  className='flex-1 text-gray-800'
-                  numberOfLines={1}
-                  ellipsizeMode='tail'
-                >
+                <Text className='flex-2 text-gray-800' numberOfLines={1}>
                   {item.supplierName}
                 </Text>
 

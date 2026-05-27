@@ -14,7 +14,6 @@ const CustomerWiseReport = () => {
   const db = useSQLiteContext();
   const [data, setData] = useState<Row[]>([]);
 
-  // 🔹 Load Customer-wise Report
   useEffect(() => {
     const loadReport = async () => {
       try {
@@ -50,18 +49,18 @@ const CustomerWiseReport = () => {
 
   return (
     <View className='flex-1 bg-gray-100 p-4'>
-      {/* 📊 Table */}
+      {/* Table */}
       <View className='bg-white rounded-2xl border border-gray-200 overflow-hidden'>
         {/* Header */}
-        <View className='flex-row items-center bg-gray-200 p-3'>
-          <Text className='w-15 font-bold text-gray-700'>Customer</Text>
-          <Text className='w-24 text-right font-bold text-gray-700 relative right-3'>
+        <View className='flex-row bg-gray-200 p-3'>
+          <Text className='flex-2 font-bold text-gray-700'>Customer</Text>
+          <Text className='flex-1 text-right font-bold text-gray-700'>
             Sales
           </Text>
-          <Text className='w-24 text-right font-bold text-gray-700 relative right-3'>
+          <Text className='flex-1 text-right font-bold text-gray-700'>
             Received
           </Text>
-          <Text className='w-24 text-right font-bold text-gray-700 relative right-3'>
+          <Text className='flex-1 text-right font-bold text-gray-700'>
             Balance
           </Text>
         </View>
@@ -72,13 +71,9 @@ const CustomerWiseReport = () => {
             data.map((item) => (
               <View
                 key={item.id}
-                className='flex-row p-3 border-t border-gray-100 items-center gap-2'
+                className='flex-row p-3 border-t border-gray-100'
               >
-                <Text
-                  className='flex-1 text-gray-800'
-                  numberOfLines={1}
-                  ellipsizeMode='tail'
-                >
+                <Text className='flex-2 text-gray-800' numberOfLines={1}>
                   {item.customerName}
                 </Text>
 
